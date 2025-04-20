@@ -82,10 +82,15 @@ def lpt(cosmo,
                               paint_absolute_pos=paint_absolute_pos,
                               halo_size=halo_size,
                               sharding=sharding)
-    dx = growth_factor(cosmo, a) * initial_force
-    p = a**2 * growth_rate(cosmo, a) * E * dx
+    gf, cosmo = growth_factor(cosmo, a)
+    gr, cosmo = growth_rate(cosmo, a)
+    dx = gf * initial_force
+    p = a**2 * gr * E * dx
     f = a**2 * E * dGfa(cosmo, a) * initial_force
     if order == 2:
+        gf2, cosmo = growth_factor_second(cosmo, a)
+        gr2,cosmo = growth_rate_second(cosmo, a)
+
         kvec = fftk(delta_k)
         pot_k = delta_k * invlaplace_kernel(kvec)
 
@@ -115,8 +120,8 @@ def lpt(cosmo,
                                 halo_size=halo_size,
                                 sharding=sharding)
         # NOTE: growth_factor_second is renormalized: - D2 = 3/7 * growth_factor_second
-        dx2 = 3 / 7 * growth_factor_second(cosmo, a) * init_force2
-        p2 = a**2 * growth_rate_second(cosmo, a) * E * dx2
+        dx2 = 3 / 7 * gf2 * init_force2
+        p2 = a**2 * gr2 * E * dx2
         f2 = a**2 * E * dGf2a(cosmo, a) * init_force2
 
         dx += dx2
